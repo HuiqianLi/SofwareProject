@@ -190,7 +190,7 @@ var Page = function() {
 		var title=json[1];
 		var content=json[2];
 		var limitTime=json[4];
-		var createTime=json[7];
+		//var createTime=json[7];
 		var breeds=json[8];
 		var sex=json[9];
 		var others=json[10];
@@ -198,6 +198,7 @@ var Page = function() {
 		$("#title").val(title);
 		$("#content").val(content);
 		$("#limit_time").val(limitTime);
+		//$("#create_time").val(createTime);
 		$("#breeds").val(breeds);
 		$("#sex").val(sex);
 		$("#others").val(others);

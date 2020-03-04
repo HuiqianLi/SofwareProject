@@ -45,7 +45,7 @@ var Record = function() {
 	    });
 	};
 	var viewRecord=function(id){
-		window.location.href="file_view.jsp?id="+id;
+		window.location.href="manage_view.jsp?id="+id;
 	};
 	var deleteRecord = function(id){
 		if(confirm("您确定要删除这条记录吗？")){

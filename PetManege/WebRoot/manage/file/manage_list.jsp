@@ -63,12 +63,6 @@
 												<button type="button" id="statistic_button" class="btn green" title="统计记录">
 													统计报表
 												</button>
-												<button type="button" id="print_button" class="btn green" title="打印记录">
-													打印
-												</button>
-												<button type="button" id="export_button" class="btn green" title="导出 记录">
-													导出
-												</button>
 											</div>
 											<div style="float: left; margin-bottom: 10px; margin-right: 10px; margin-left: 10px; margin-top: 10px;">
 												<button type="button" id="return_button" class="btn green" title="返回到前一个页面">

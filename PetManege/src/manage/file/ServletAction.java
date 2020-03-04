@@ -415,7 +415,8 @@ public class ServletAction extends HttpServlet {
 		for(int i=0;i<jsonArr.length();i++){
 			ArrayList list=(ArrayList)jsonArr.get(i);
 			if(id.equals(list.get(0)+"")){
-				index=list.get(11)+"";
+				//index=list.get(11)+"";index计算不正确
+				index=i+"";
 				break;
 			}
 		}
@@ -694,7 +695,7 @@ public class ServletAction extends HttpServlet {
 			//开始导出到excel
 			ExcelWriter ew=new ExcelWriter();
 			String[] cols={"index⊙text⊙nick","time_interval⊙text⊙nick","count⊙text⊙nick","color⊙text⊙nick","color_name⊙text⊙nick"};	//name⊙type⊙nick
-			ew.CreExcel(jsonObj, "卡口统计", cols, filePathName);
+			ew.CreExcel(jsonObj, "宠物管理", cols, filePathName);
 			jsonObj.put("result_code",0);
 			jsonObj.put("result_msg","读取了上一次的查询配置");
 		}

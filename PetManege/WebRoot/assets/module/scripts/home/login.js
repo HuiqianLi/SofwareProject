@@ -4,8 +4,10 @@ jQuery(document).ready(function() {
 	Demo.init(); // init demo features
 	Login.init();
 	Page.init();
+	Record.init();
 });
 var toCheckEmail="";
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 var Login = function() {
     var handleLogin = function() {
 
@@ -51,9 +53,9 @@ var Login = function() {
                 error.insertAfter(element.closest('.input-icon'));
             },
 
-            submitHandler: function(form) {
+            /*submitHandler: function(form) {
                 form.submit(); // form validation success, call ajax form submit
-            }
+            }*/
         });
         $('.login-form #remember').click(function() {
         	if(this.checked){
@@ -73,6 +75,21 @@ var Login = function() {
         		clearCookie("remember");
         	}
         });
+        $('.login-form #login_in_button').click(function(json) {
+        	
+        	if(($("#user_id").val()=="") || ($("#user_password").val()=="")){
+        		alert("请您输入账号和密码！");
+        	}else{
+        		//检查用户信息
+        		var userId=$("#user_id").val();
+        		var passwd=$("#user_password").val();
+        		Record.CHECKUSER(userId,passwd);
+        		
+        	}
+        	
+        	
+        });
+        
         var clearCookie=function(name) {
         	setCookie(name, "", -1);
         }
@@ -118,7 +135,7 @@ var Login = function() {
         });
         checkCookie();
     }
-
+//////////////////////////////////////////////////////////////////////////////////////////
     var handleForgetPassword = function() {
         $('.forget-form').validate({
             errorElement: 'span', //default input error message container
@@ -169,30 +186,35 @@ var Login = function() {
                 return false;
             }
         });
-
+        $("#emailinput-btn").click(function() {
+           	var userId=$("#forget_user_id").val();
+    		var Email=$("#forget_email").val();
+    		if(checkforgetmsg()==true){
+    			Record.querypasswd(userId,Email);
+    		}
+        	
+        	});
+        var checkforgetmsg=function(){
+        	var tag=true;
+        	var Email=$("#email").val();
+        	if(($("#forget_user_id").val()=="") 
+        		|| ($("#forget_email").val()=="")){
+        		alert("仍有信息未填写！");
+        		tag=false;
+        	}
+    		return tag;
+        	
+        }
         jQuery('#forget-password').click(function() {
             jQuery('.login-form').hide();
             jQuery('.forget-form').show();
         });
-
+        
         jQuery('#back-btn').click(function() {
             jQuery('.login-form').show();
             jQuery('.forget-form').hide();
         });
-        jQuery('#emailinput-btn').click(function() {
-        	var userId=$("#forget_user_id").val();
-        	var email=$("#forget_email").val();
-        	$.post("../../security_user_data_action?action=check_user_email&user_id="+userId+"&email="+email,function(data){
-        		var json=eval("("+data+")");
-        		if(json.result_code==0){
-        			toCheckEmail=json.user_email;
-                    jQuery('.emailcheck-form').show();
-                    jQuery('.forget-form').hide();
-        		}else{
-        			alert(json.result_msg);
-        		}
-        	});
-        });
+        
         jQuery('#emailcheck-btn').click(function() {
         	var addressUrl=gotoEmail(toCheckEmail);
         	if(addressUrl!=""){
@@ -250,7 +272,7 @@ var Login = function() {
             }
         };
     }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
     var handleRegister = function() {
         function format(state) {
             if (!state.id) return state.text; // optgroup
@@ -273,7 +295,40 @@ var Login = function() {
 	            $('.register-form').validate().element($(this)); //revalidate the chosen dropdown value and show error or success message for the input
 	        });
     	}
-        //$("#register-submit-btn").click(function() {Page.submitRecord();});
+        $("#register_in_button").click(function() {
+           	var userId=$("#register_user_id").val();
+    		var passwd=$("#register_password").val();
+    		var userName=$("#register_full_name").val();
+    		var Email=$("#email").val();
+    		if(checkregisterin()==true){
+    			Record.giveRecord(userId,passwd,userName,Email);
+            	Page.turntologin();
+    		}
+        	
+        	});
+        
+        var checkregisterin=function(){
+        	var tag=true;
+        	var Email=$("#email").val();
+        	if(($("#register_user_id").val()=="") 
+        		|| ($("#register_password").val()=="")
+        			|| ($("#register_password_again").val()=="" )
+        				|| ($("#register_full_name").val()=="" )
+        					|| ($("#email").val()=="")){
+        		alert("仍有信息未填写！");
+        		tag=false;
+        	}
+        	else{
+        		if($("#register_password").val()!=$("#register_password_again").val()){
+        			alert("两次密码不一致！");
+        			tag=false;
+        		}
+    		}
+        	
+    		return tag;
+        	
+        }
+    
         var checkInput=function(){
         	var userId=$("#register_user_id").val();
         	var userIdPattern = /^[a-zA-Z0-9_]{1,}$/;
@@ -378,36 +433,9 @@ var Login = function() {
             jQuery('.login-form').show();
             jQuery('.register-form').hide();
         });
-        //二维码扫码登陆部分
-        var getStatusTimer;
-        $('#scan-qrcode-btn').click(function(){
-        	jQuery('.login-form').hide();
-        	jQuery('.qrcode-form').show();
-        	showQrCode();
-        });
-        $('#qrcode-back-btn').click(function(){
-        	jQuery('.login-form').show();
-        	jQuery('#qrcode-form').hide();
-        	clearTimeout(getStatusTimer);
-        });
-        var showQrCode=function(){
-    		//然后显示二维码
-    		$.post("../../security_user_data_action?action=create_wechat_qrcode_auth&module=teach",function(data){
-    			var json=eval("("+data+")");
-    			if(json.result_code==0){
-    				$("#qrcode_image").attr("src","https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+json.ticket);
-   					//开始定时查询
-   					console.log("开始getTicketStatus");
-   					getTicketStatus();
-    			}else{
-    				if(Page!=null){
-    					Page.processError(json);
-    				}
-    			}
-    		});
-        }
+       
     	var getTicketStatus=function(){
-    		$.post("../../security_user_data_action?action=get_ticket_status&module=teach",function(data){
+    		$.post("../../user_login_servlet_action?action=get_ticket_status&module=teach",function(data){
     			var json=eval("("+data+")");
     			if(json.result_code==0){
     				Metronic.startPageLoading({message: '登陆成功，正在跳转主界面中，请稍候...'});	//开始等待动画
@@ -426,7 +454,7 @@ var Login = function() {
     	}
     }
     var setGlobalSessionConfig=function(){
-    	$.post("../../security_user_data_action?action=set_global_session_config",function(data){
+    	$.post("../../user_login_servlet_action?action=set_global_session_config",function(data){
     		var json=eval("("+data+")");
     		if(json.result_code==0){
     		}else{
@@ -454,13 +482,22 @@ var Page = function() {
 	};
 	var processError=function(json){
 	};
+	
 	var help=function(){
 		var strUrl=location.pathname;
 		window.open('../../help/online/new_win_help.jsp?page_url='+strUrl, 'big', 'fullscreen=yes');
 	};
+	var turntoindex=function(userId,userName,role){
+		window.location.href="../../home/main/index.jsp?user_role="+role+"&user_id="+userId+"&user_name="+userName;
+	};
 	var serviceRule=function(){
 		window.open("");
 	};
+	
+	var turntologin=function(){
+		alert("注册成功！请返回页面登录");
+		window.location.href="../../home/main/login.jsp";
+	}
 	var privateRule=function(){
 		
 	};
@@ -474,11 +511,140 @@ var Page = function() {
 		help:function(){
 			help();
 		},
+		turntoindex:function(userId,userName,role){
+			turntoindex(userId,userName,role);
+		},
+		turntologin:function(){
+			turntologin();
+		},
 		serviceRule:function(){
 			
 		},
+		
 		privateRule:function(){
 			
 		}
 	}
 }();//Page
+/*================================================================================*/
+var Record = function() {
+	var userId=undefined;
+	var userName=undefined;
+	var userRole=undefined;
+	var userAvatar=undefined;
+	var initRecordStyle = function() {
+	};
+	var initRecordList = function(){
+		getRecord();
+	}
+	var getRecord = function(){
+		Metronic.startPageLoading({message: '正在查询中，请稍候...'});	//开始等待动画
+		var id=$("#id").val();
+		var existResultset=$("#exist_resultset").val();
+		var url="../../user_login_servlet_action?action=get_record&id="+id+"&exist_resultset="+existResultset;
+		$.post(url,function(json){
+			if(json.result_code==0){
+				Record.userId=json.user_id;
+				Record.userName=json.user_name;
+				Record.userRole=json.user_role;
+				Record.userAvatar=json.user_avatar;
+				//Page.showResult(json);
+			}else{
+				if(Page!=null){
+					Page.processError(json);
+				}
+			}
+			Metronic.stopPageLoading();	//停止等待动画
+		}).error(function(xhr,errorText,errorType){
+	        alert('错误信息：'+errorText+",错误类型："+errorType);
+	    });
+	};
+	var giveRecord=function(userId,passwd,userName,Email){
+		//待完成
+		var url="../../user_login_servlet_action?action=add_record" +
+				"&register_user_id="+userId+"&register_passwd="+passwd+
+				"&register_full_name="+userName+"&email="+Email;
+		//alert(url);
+		$.post(url,function(data){
+			//alert("注册成功！");
+		});
+		
+	};
+	
+	var CHECKUSER=function(userId,passWd){
+		var url="../../user_login_servlet_action?action=get_record&user_account="+userId;
+		//alert(url);
+		$.post(url,function(data){
+			//alert(data);
+			var json=eval("("+data+")");
+	        var list=json.aaData;
+			//alert(list[0].user_name);
+	        if((list[0].user_account==""))
+				alert("账号不存在！");
+			else
+			{
+				if(passWd==list[0].passwd){
+					var role="";
+					var userId=list[0].user_account;
+					var userName=list[0].user_name;
+					
+					if(list[0].user_role=="normal")
+						role="normal";
+					else
+						role="manager";
+					alert("登陆成功！");
+					
+					Page.turntoindex(userId,userName,role);
+					}
+				else
+					alert("密码错误！");
+			}
+		});
+	}
+	var querypasswd=function(userId,Email){
+		var url="../../user_login_servlet_action?action=get_record&user_account="+userId;
+		//alert(url);
+		$.post(url,function(data){
+			//alert(data);
+			var json=eval("("+data+")");
+	        var list=json.aaData;
+			//alert(list[0].user_name);
+			if((list[0].user_account==""))
+				alert("账号不存在！");
+			else
+			{
+				if(Email==list[0].email)
+					alert("验证成功！您的密码是："+list[0].passwd);
+			}
+		});
+	}
+	
+	var search=function(){
+		page_form.submit();
+	}
+	return {
+		init: function() {
+			initRecordList();
+			initRecordStyle();
+		},
+		
+		CHECKUSER:function(userId,passWd){
+			console.log("Recoed的CHECKUSER入口："+userId+",检查依据："+passWd);
+			CHECKUSER(userId,passWd);
+		},
+		check:function(){
+			check();
+		},
+		giveRecord:function(userId,passwd,userName,Email){
+			giveRecord(userId,passwd,userName,Email);
+		},
+		querypasswd:function(userId,Email){
+			querypasswd(userId,Email);
+		},
+		search:function(){
+			search();
+		}
+	};
+}();//Record;
+/* ================================================================================ */
+//关于页面的控件生成等操作都放在Page里，和Record独立，Record主要是和记录集交互

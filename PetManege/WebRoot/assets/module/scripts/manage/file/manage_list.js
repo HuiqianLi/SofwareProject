@@ -44,7 +44,8 @@ var Record = function() {
 	    });
 	};
 	var viewRecord=function(id){
-		window.location.href=sub+"_view.jsp?id="+id+"&exist_resultset=1";
+		//window.location.href=sub+"_view.jsp?id="+id+"&exist_resultset=1";
+		window.location.href="manage_view.jsp?id="+id+"&exist_resultset=1";
 	};
 	var deleteRecord = function(id){
 		if(confirm("您确定要删除这条记录吗？")){
@@ -177,7 +178,8 @@ var Page = function() {
 		html=html+"																<span>品种："+breed+"</span><p>";
 		html=html+"																<span>性别："+sex+"</span><p>";
 		html=html+"																<span>其他信息："+others+"</span><p>";
-		if(me=="1"){
+		//if(me=="1"){
+		if("1"=="1"){
 			html=html+"																<button  type=\"button\" class=\"btn-small\" onclick=\"Page.deleteRecord("+id+");\">删除</button>";
 			html=html+"																<button  type=\"button\" class=\"btn-small\" onclick=\"Page.modifyRecord("+id+");\">修改</button>";
 		}

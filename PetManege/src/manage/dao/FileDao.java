@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -204,39 +206,91 @@ public class FileDao{
 	/*
 	 * 功能：构造历史记录查询的sql语句,type=all查询所有，type=id查询某个记录，余下按照条件设置查询
 	 */
-	private String createGetRecordSql(ManageFile query){
-		String sql="";
-		String where="";
-		if(query.getId()!=null && !query.getId().equals("null")){
-			where="where id="+query.getId();
-		}
-		if(query.getTitle()!=null && !query.getTitle().equals("null") && !query.getTitle().isEmpty()){
-			if(!where.isEmpty()){
-				where=where+" and title like '%"+query.getTitle()+"%'";
-			}else{
-				where="where title like '%"+query.getTitle()+"%'";
-			}
-		}
-		if(query.getTimeFrom()!=null && query.getTimeTo()!=null && !query.getTimeFrom().isEmpty()){
-			if(!where.isEmpty()){
-				where=where+" and create_time between '"+query.getTimeFrom()+"' and '"+query.getTimeTo()+"'";
-			}else{
-				where="where create_time between '"+query.getTimeFrom()+"' and '"+query.getTimeTo()+"'";
-			}
-		}
-		if(query.getType()!=null && query.getType().equals("all") && query.getUserRole().equals("manager")){
-			sql="select * from "+query.getTableName()+" order by create_time desc";
+private String createGetRecordSql(ManageFile query){
+	String sql="";
+	String where="";
+	/*
+	//根据id查询记录
+	if(query.getId()!=null && !query.getId().equals("null")){
+		where="where id="+query.getId();
+	}
+	//根据名称查询的纪录
+	if(query.getTitle()!=null && !query.getTitle().equals("null") && !query.getTitle().isEmpty()){
+		if(!where.isEmpty()){
+			where=where+" and title like '%"+query.getTitle()+"%'";
 		}else{
-			if(query.getId()!=null && !query.getId().equals("null")){
-				sql="select * from "+query.getTableName()+" where id="+query.getId();
+			where="where title like '%"+query.getTitle()+"%'";
+		}
+	}
+	//查询时间段内的纪录
+	if(query.getTimeFrom()!=null && query.getTimeTo()!=null && !query.getTimeFrom().isEmpty()){
+		if(!where.isEmpty()){
+			where=where+" and create_time between '"+query.getTimeFrom()+"' and '"+query.getTimeTo()+"'";
+		}else{
+			where="where create_time between '"+query.getTimeFrom()+"' and '"+query.getTimeTo()+"'";
+		}
+	}
+	showDebug(query.getUserRole()+" type为:"+query.getType());
+	if(query.getType()!=null && query.getType().equals("all") && query.getUserRole().equals("manager")){
+		sql="select * from "+query.getTableName()+" order by create_time desc";
+	}else{
+		if(query.getId()!=null && !query.getId().equals("null")){
+			sql="select * from "+query.getTableName()+" where id="+query.getId();
+		}else{
+			if(where.isEmpty()){
+				sql="select * from "+query.getTableName()+" where user_id='"+query.getUserId()+"' order by create_time desc";
 			}else{
-				if(where.isEmpty()){
-					sql="select * from "+query.getTableName()+" where user_id='"+query.getUserId()+"' order by create_time desc";
-				}else{
-					sql="select * from "+query.getTableName()+" "+where+" and user_id='"+query.getUserId()+"' order by create_time desc";
-				}
+				sql="select * from "+query.getTableName()+" "+where+" and user_id='"+query.getUserId()+"' order by create_time desc";
 			}
 		}
+	}
+	return sql;
+	
+	*/
+	
+	
+	//根据名称查询的纪录
+	if(query.getTitle()!=null && !query.getTitle().equals("null") && !query.getTitle().isEmpty()){
+		if(!where.isEmpty()){
+			where=where+" and title like '%"+query.getTitle()+"%'";
+		}else{
+			where="where title like '%"+query.getTitle()+"%'";
+		}
+	}
+	
+	//查询时间段内的纪录
+	if(query.getTimeFrom()!=null && query.getTimeTo()!=null && !query.getTimeFrom().isEmpty()){
+		if(!where.isEmpty()){
+			where=where+" and create_time between '"+query.getTimeFrom()+"' and '"+query.getTimeTo()+"'";
+		}else{
+			where="where create_time between '"+query.getTimeFrom()+"' and '"+query.getTimeTo()+"'";
+		}
+	}
+	if(query.getUserRole().equals("manager"))
+	{
+		sql="select * from "+query.getTableName()+" "+where+" order by create_time desc";
 		return sql;
 	}
+	//根据id查询记录
+	showDebug("query.Userid为"+query.getUserId());
+	if(query.getUserId()!=null || !query.getUserId().equals("null")){
+		if(!where.isEmpty()){
+			where=where+" and user_id='"+query.getUserId()+"'";
+		}else{
+			where="where user_id='"+query.getUserId()+"'";
+		}			
+	}
+	
+	showDebug("where语句："+where);
+	sql="select * from "+query.getTableName()+" "+where+" order by create_time desc";
+	return sql;
+	
+	
+
 }
+
+public void showDebug(String msg){
+	System.out.println("["+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date())+"]["+"/FileDao]"+msg);
+}
+}
+

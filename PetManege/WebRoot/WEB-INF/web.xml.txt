@@ -1,0 +1,10 @@
+﻿<!-- ================  login begin =================           -->
+<servlet>
+    <servlet-name>user_login_servlet_action</servlet-name>
+    <servlet-class>user.login.ServletAction</servlet-class>
+ </servlet>
+ <servlet-mapping>
+    <servlet-name>user_login_servlet_action</servlet-name>
+    <url-pattern>/user_login_servlet_action</url-pattern>
+ </servlet-mapping>
+<!-- ================  login end =================           -->

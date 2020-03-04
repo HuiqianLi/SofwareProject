@@ -63,7 +63,7 @@ var Page = function() {
 		if(json.result_code==3){
 			//session超时了
 			alert("长时间没有操作导致系统需要重新登陆，请您前往登陆界面登陆。");
-			window.location.href="../../home/main/login.jsp";
+			//window.location.href="../../home/main/login.jsp";
 		}
 	};
 	return {
